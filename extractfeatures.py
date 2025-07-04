@@ -7,7 +7,7 @@ import os
 
 if __name__ == "__main__":
 
-    filename='audio\jyirt.wav'  # Change this to extract from another file
+    filename='audio/hiyis.wav'  # Change this to extract from another file
 
     audioarray,sr=librosa.load(filename, sr=None)
     print("Audio array: ",audioarray)
@@ -57,9 +57,9 @@ mfccs=np.split(mfcc,num_mfcc_coeffs)
 mfcc_deltas=np.split(mfcc_delta,num_mfcc_coeffs)
 mfcc_delta2s=np.split(mfcc_delta2,num_mfcc_coeffs)
 for i in range(num_mfcc_coeffs):
-    df[f'mfcc_{i}']=mfccs[0][0]
-    df[f'mfcc_delta1_{i}']=mfcc_deltas[0][0]
-    df[f'mfcc_delta2_{i}']=mfcc_delta2s[0][0]
+    df[f'mfcc_{i}']=mfccs[i][0]
+    df[f'mfcc_delta1_{i}']=mfcc_deltas[i][0]
+    df[f'mfcc_delta2_{i}']=mfcc_delta2s[i][0]
 df = df.reindex(columns=sorted(df.columns))
 df['zero_crossing_rate']=zero_crossing_rate[0]
 df['rms']=rms[0]

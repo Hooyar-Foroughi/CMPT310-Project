@@ -5,3 +5,9 @@
 # Ignore Python bytecode cache directories
 __pycache__/
 **/__pycache__/
+
+# Ignore all audio and annotation files
+*.wav
+*.rttm
+
+scrap.py

@@ -15,5 +15,5 @@ def main(audio_path):
     print(f"\nEstimated number of speakers: {num_speakers}")
 
 if __name__ == "__main__":
-    audio_path = "audio/test1.wav"
+    audio_path = "data/wav/test1.wav"
     main(audio_path)

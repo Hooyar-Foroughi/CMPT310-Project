@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(REPO_ROOT)) 
 
-from datasets.seq_dataset import SeqSpeakerCount, collate
+from features.seq_dataset import SeqSpeakerCount, collate
 from models.seq_count_lstm import SeqCountLSTM
 
 

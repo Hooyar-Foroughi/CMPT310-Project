@@ -7,8 +7,8 @@ from sklearn.metrics import silhouette_score
 # Load the audio file
 # Replace 'audio/jyirt.wav' with the path to your multi-speaker audio file
 wav_fpath = Path('audio/jyirt.wav') 
+print("File name:", wav_fpath)
 wav = preprocess_wav(wav_fpath)
-print(wav)
 # Initialize the VoiceEncoder
 # You can specify "cuda" for GPU if available, otherwise it defaults to "cpu"
 encoder = VoiceEncoder("cpu") 
@@ -22,12 +22,13 @@ encoder = VoiceEncoder("cpu")
 # A common rate is 16, meaning an embedding every 0.0625 seconds.
 _, cont_embeds, wav_splits = encoder.embed_utterance(wav, return_partials=True, rate=16)
 
-print(f"Shape of continuous embeddings: {cont_embeds.shape}")
-print(f"Number of audio splits (segments): {len(wav_splits)}")
+# print(f"Shape of continuous embeddings: {cont_embeds.shape}")
+# print(f"Number of audio splits (segments): {len(wav_splits)}")
 
 pplCount=0
 highscore=0
 model=None
+print("\nNumber of clusters starting from 2-10")
 for i in range(2,11):
     cluster_model = AgglomerativeClustering(n_clusters=i)
     # cluster_model=KMeans(n_clusters=i, n_init='auto')
@@ -38,5 +39,6 @@ for i in range(2,11):
         highscore=score
         pplCount=i
         model=cluster_model
+print("\n")
 print("People Count: ", pplCount)
 print("Labels: ", model.fit_predict(cont_embeds))

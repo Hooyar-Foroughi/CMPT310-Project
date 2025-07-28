@@ -69,10 +69,6 @@ for i, segments in enumerate(speaker_segments):
     for start, end in segments:
         print(f"  - [{start:.2f}s - {end:.2f}s]")
 
-# You would then apply the consolidation logic as discussed before,
-# using these now-correctly-calculated start_time_seconds and end_time_seconds.
-# For a more coherent view, merge adjacent segments for the same speaker
-
 coherent_speaker_segments=[]
 for i in range(pplCount):
     coherent_speaker_segments.append([])

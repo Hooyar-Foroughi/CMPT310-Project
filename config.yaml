@@ -1,0 +1,57 @@
+
+#  1. Select the task to run by setting the 'task' variable below
+#  2. Adjust the general and per-task settings as needed.
+#  3. Run the script using the command: python3 run.py at the project root.
+
+# ----------------------------------  Task selector  
+# One of: cluster | extract | train | predict | visualize | cluster_scatter
+task: cluster_scatter
+
+# ----------------------------------  General settings and paths ----------------------------------
+
+# Partial frame rate (Hz) (this is the rate of the embeddings extracted)       
+rate: 4  
+# thread-pool size              
+workers: 1
+# folder of WAV clips
+wav_dir: data/wav  
+# ground-truth RTTM (cluster eval only)        
+rttm_dir: data/rttm 
+ # where CSV / TXT metrics are saved        
+out_dir: results   
+
+# ----------------------------------  Per task settings below ----------------------------------
+
+# ----------------------------------  Visualisation of evaluation results (visualize task)  
+# CSV file to visualize - leave blank to auto-pick latest
+viz_csv: results/sup_xgb.csv
+
+# ----------------------------------  Clustering visualisation (cluster_scatter task) 
+scatter_wav: data/wav/gylzn.wav
+scatter_method: spectral    # or agglomerative / hdbscan
+scatter_rate: 16
+
+# ----------------------------------  Unsupervised (cluster task) 
+# Set to 'data/wav' to cluster all WAV files and save results in 'results' folder
+# or set to a single WAV file to get prediction for just that file
+cluster_target: data/wav/leneg.wav  
+# spectral | agglomerative | hdbscan
+method: spectral 
+# lowest k examined
+kmin: 2    
+# highest k examined        
+kmax: 5                
+
+# ----------------------------------  Feature extraction (extract task)
+# output file
+features_csv: features_pooled.csv  
+
+# ----------------------------------  Supervised training (train task) 
+# mlp | xgb | hgb
+algo: xgb          
+# (uses features_csv path above)
+
+# ----------------------------------  Supervised (predict task)
+model_path: models/speaker_count_mlp.pkl   
+# wav file or folder to classify
+predict_target: data/wav/gylzn.wav       

@@ -1,0 +1,14 @@
+resemblyzer==0.1.4
+numpy
+scipy
+pandas
+scikit-learn
+hdbscan
+librosa
+tqdm
+pyyaml
+joblib
+matplotlib
+soundfile
+# Optional — only if you train XGBoost models
+xgboost

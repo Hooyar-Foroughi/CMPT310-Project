@@ -1,25 +1,169 @@
-# CMPT310-Project
+# CMPT310 Speaker Diarization Project
 
-Install requirements: ***pip install -r requirements.txt***
+This project implements both supervised and unsupervised methods for **speaker diarization**, the process of segmenting an audio stream by speaker identity. We experiment with a variety of techniques and evaluate their performance both quantitatively and visually to gain deeper insights into how diarization can be approached effectively. By comparing different clustering strategies, classifier pipelines, and preprocessing techniques, we aim to understand the impact of various design decisions.
 
-Test/dev set audio files from: https://github.com/joonson/voxconverse?tab=readme-ov-file 
+A particularly promising approach comes from our unsupervised spectral clustering implementation. This method builds an affinity matrix from speaker embeddings and applies spectral decomposition followed by k-means clustering to separate speakers. What makes our implementation unique is that we explore a range of cluster values (k), evaluating each and selecting the best fit based on objective criteria like eigen-gap analysis. This enables the model to adapt dynamically to the actual number of speakers in a recording. The strength of this technique lies in its ability to uncover the natural structure of the data without requiring labeled examples. By combining voice embeddings, affinity refinement, and eigen-space projection, our approach can distinguish speakers based on subtle acoustic features.
 
-<h4> Currently we have 2 implementations to compare and build off of: </h4>
+To support analysis, we generate visualizations of the clustering output using scatter plots and histograms. These help us interpret how well the embeddings and clustering methods isolate speakers. Visual outputs include per-audio scatter plots of clustered embeddings and bar charts comparing true vs predicted number of speakers, allowing us to evaluate not just accuracy but clustering behavior.
 
-***Pooled-stats MLP:*** Converts each audio clip into a single summary vector using statistics (mean, std, etc.) of speaker embeddings. Then trains a small MLP classifier on those vectors.
+## Features
 
-```bash
-python3 features/extractfeatures.py      # (re-run if audio clips changed)
-python3 train-test/train.py
-python3 train-test/evaluate.py
+- **Voice encoder-based feature extraction** from audio
+- **Unsupervised clustering** using Spectral, Agglomerative, and HDBSCAN
+- **Supervised classification** using Scikit-learn pipelines
+- **Evaluation** using RTTM ground-truth files
+- **Visualizations** of clustering and performance metrics
+
+---
+
+## Directory Structure
+
+```
+├── data/
+│   ├── wav/              # Raw .wav audio files
+│   └── rttm/             # Corresponding RTTM label files
+├── models/               # Saved supervised models
+├── results/              # CSV results for predictions and clustering
+├── visualizations/       # Clustering scatter plots
+├── src/                  # Main source code
+│   ├── pipelines/        # Supervised + Unsupervised logic
+│   ├── features.py       # Feature extraction methods
+│   ├── visualization.py  # Plotting tools
+│   ├── filter_dataset.py # Filters our /data to keep appropriate samples
+│   ├── clustering.py     # Implements unsupervised speaker count prediction
+│   └── evaluate.py       # Provides utilities to compute and save classification metrics
+├── config.yaml           # Main configuration file
+├── run.py                # CLI runner
+└── requirements.txt      # Python dependencies
 ```
 
-***Seq-embeddings Bi-LSTM:*** Keeps the full sequence of speaker embeddings per clip. Feeds them into a bidirectional LSTM with attention, which learns to weigh and combine time steps.
+---
+
+## Installation
+
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Download the test and dev set `.wav` and `.rttm` files:
+   - Source: [VoxConverse](https://github.com/joonson/voxconverse)
+   - Place `.wav` files in `data/wav/`
+   - Place `.rttm` files in `data/rttm/`
+
+---
+
+## Usage
+
+All tasks are run via:
 
 ```bash
-python3 features/extractfeatures.py      # generates .npz sequence files
-python3 train-test/train_seq.py
-python3 train-test/eval_seq.py
+python run.py
 ```
 
-*Both methods share the same feature extractor (extractfeatures.py). Just pick the training pipeline you want to use afterward.*
+The task is configured through `config.yaml`.
+
+---
+
+## Config (`config.yaml`) 
+
+The entire behavior of the system is controlled via `config.yaml`. Below is a breakdown of key sections:
+
+### Task Selector
+```yaml
+task: train  # Options: train | predict | cluster | extract | evaluate | visualize | cluster_scatter
+```
+This determines which task is executed when running `python run.py`.
+
+---
+
+### General Settings
+```yaml
+rate: 4         # Embedding frame rate (Hz)
+workers: 1      # Thread pool size
+```
+
+---
+
+### Paths
+```yaml
+wav_dir: data/wav
+rttm_dir: data/rttm
+out_dir: results
+```
+Set locations of input audio files, ground-truth RTTM files, and output results.
+
+---
+
+### Supervised Training
+```yaml
+algo: xgb  # Options: mlp | xgb | hgb
+features_csv: features_pooled.csv
+```
+Specifies which algorithm to use for supervised classification and the path for storing feature data.
+
+---
+
+### Supervised Prediction
+```yaml
+model_path: models/speaker_count_mlp.pkl
+predict_target: data/wav/gylzn.wav
+```
+Runs inference on a given WAV file using a trained model.
+
+---
+
+### Unsupervised Clustering
+```yaml
+method: spectral  # Options: spectral | agglomerative | hdbscan
+cluster_target: data/wav/leneg.wav  # File or folder
+kmin: 2
+kmax: 5
+```
+Defines clustering method and how many speaker clusters to evaluate.
+
+---
+
+### Feature Extraction
+```yaml
+features_csv: features_pooled.csv
+```
+Output path for pooled features.
+
+---
+
+### Evaluation
+No specific config keys—just ensure `task: evaluate` is set and predictions are available in `results/`.
+
+---
+
+### Visualization
+```yaml
+viz_csv: results/sup_xgb.csv
+```
+Specify the results CSV to use for visual summary plots like bar charts.
+
+---
+
+### Cluster Scatter Plot
+```yaml
+task: cluster_scatter
+scatter_wav: data/wav/gylzn.wav
+scatter_method: spectral
+scatter_rate: 16
+```
+Generates a scatter plot visualization of embeddings for one WAV file, using the same clustering logic and parameters.
+---
+
+## Requirements
+
+- Python 3.10+
+- See `requirements.txt` for dependencies
+
+---
+
+## Acknowledgements
+
+- [VoxConverse Dataset](https://github.com/joonson/voxconverse)
+- [Resemblyzer Voice Encoder](https://github.com/resemble-ai/Resemblyzer)
+- Built for SFU CMPT 310

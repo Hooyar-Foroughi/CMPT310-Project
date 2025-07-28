@@ -29,10 +29,10 @@ def maketimestamp(path):
     modellabels=None
     print("\nNumber of clusters starting from 2-10")
     for i in range(2,11):
-        # Agglomerative works best for standard clear cases (Faster but less sensitive)
+        # Agglomerative works best for standard clear cases (Faster but less noisy)
         cluster_model = AgglomerativeClustering(n_clusters=i)
 
-        # Spectural works best with noisy unclear cases (Slower but it's more sensitive)
+        # Spectural works best with noisy unclear cases (Slower but it's more noisy)
         # cluster_model = SpectralClustering(n_clusters=i)
 
         # KMeans does not work because spherical radius does not properly capture each distinct voice
@@ -77,7 +77,6 @@ def maketimestamp(path):
         current_start, current_end = segments[0]
         for i in range(1, len(segments)):
             next_start, next_end = segments[i]
-            
             # If the next segment is immediately after or overlaps slightly, merge them
             if next_start - current_end < 0.1:  # 0.1s tolerance for merging
                 current_end = next_end
@@ -90,7 +89,9 @@ def maketimestamp(path):
     for i, segments in enumerate(coherent_speaker_segments):
         for start, end in segments:
             timestamp.loc[len(timestamp)]={'speaker':i,'start':start,'end':end}
+    timestamp=timestamp.sort_values('start')
     print(timestamp)
+
     # print(wav_fpath.name)
     timestamp.to_csv(str(Path('timestamp')/wav_fpath.stem)+'.csv',index=False)
 

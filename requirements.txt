@@ -1,7 +1,0 @@
-resemblyzer==0.1.4
-scikit-learn
-librosa
-soundfile
-numpy
-matplotlib
-pandas

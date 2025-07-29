@@ -14,6 +14,7 @@ assert(os.path.exists('audio/'+Path(file).stem+".wav")) # Verify that an .wav fi
 
 screen=pygame.display.set_mode((640,640))
 font=pygame.font.Font(None,size=50)
+smallfont=pygame.font.Font(None,size=25)
 sound=None
 running = True
 clock=pygame.time.Clock()
@@ -38,9 +39,11 @@ colors = [
 ]
 square_size = 50
 squares = []
+hollowsquares = []
 
 timestamps=pd.read_csv(file)
 numspeakers=timestamps['speaker'].max()+1
+# numspeakers=10
 text = font.render(f'Number of speakers: {numspeakers}',True,(255,255,255))
 
 for i in range(numspeakers):
@@ -48,7 +51,7 @@ for i in range(numspeakers):
     x = 50 + (i % 5) * (square_size + 20)
     y = 50 + (i // 5) * (square_size + 20)
     squares.append(pygame.Rect(x, y, square_size, square_size))
-
+    hollowsquares.append(pygame.Rect(x+1, y+1, square_size-2, square_size-2))
 
 while running:
     for event in pygame.event.get():
@@ -60,11 +63,12 @@ while running:
     screen.blit(text,(50,400))
     time=(pygame.time.get_ticks() - start_playback_time_ticks) / 1000.0
     screen.blit(font.render(f'Current Time: {time}',True,(255,255,255)),(50,450))
-    screen.blit(font.render(f'Timestamp File: {file}',True,(255,255,255)),(50,500))
+    screen.blit(smallfont.render(f'Timestamp File: {file}',True,(255,255,255)),(50,500))
     interval=timestamps[(timestamps['start']<time)&(timestamps['end']>time)]
     for i in range(numspeakers):
-        if i in interval['speaker'].values:
-            pygame.draw.rect(screen, colors[i], squares[i])
+        pygame.draw.rect(screen, colors[i], squares[i])        
+        if i not in interval['speaker'].values:
+            pygame.draw.rect(screen, (0,0,0), hollowsquares[i])
     pygame.display.flip() # Refresh screen
     clock.tick(60)  # Delay
     if (time > timestamps['end'].max() + 1): # Added a small buffer

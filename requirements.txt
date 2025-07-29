@@ -5,3 +5,5 @@ soundfile
 numpy
 matplotlib
 pandas
+torch
+seaborn

@@ -6,7 +6,13 @@ from sklearn.metrics import silhouette_score
 import pandas as pd
 import sys
 
-def maketimestamp(path):
+def maketimestamp(path,model="ag"):
+    assert((model=="ag")|(model=="sp"))
+    if model=="sp":
+        outputdirectory = 'sptimestamp'
+    else:
+        outputdirectory = 'agtimestamp'
+
     # Load the audio file
     # Replace 'audio/jyirt.wav' with the path to your multi-speaker audio file
     wav_fpath = Path(path) 
@@ -25,15 +31,17 @@ def maketimestamp(path):
 
     pplCount=0
     highscore=0
-    model=None
     modellabels=None
     print("\nNumber of clusters starting from 2-10")
     for i in range(2,11):
+    # for i in range(2):
         # Agglomerative works best for standard clear cases (Faster but less noisy)
-        cluster_model = AgglomerativeClustering(n_clusters=i)
+        if model=="ag":
+            cluster_model = AgglomerativeClustering(n_clusters=i)
 
         # Spectural works best with noisy unclear cases (Slower but it's more noisy)
-        # cluster_model = SpectralClustering(n_clusters=i)
+        if model=="sp":
+            cluster_model = SpectralClustering(n_clusters=i)
 
         # KMeans does not work because spherical radius does not properly capture each distinct voice
         # cluster_model=KMeans(n_clusters=i, n_init='auto')
@@ -44,7 +52,6 @@ def maketimestamp(path):
         if highscore < score:
             highscore=score
             pplCount=i
-            model=cluster_model
             modellabels=labels
     print("\n")
     print("People Count: ", pplCount)
@@ -92,8 +99,10 @@ def maketimestamp(path):
     timestamp=timestamp.sort_values('start')
     print(timestamp)
 
-    # print(wav_fpath.name)
-    timestamp.to_csv(str(Path('timestamp')/wav_fpath.stem)+'.csv',index=False)
+    timestamp.to_csv(str(Path(outputdirectory)/wav_fpath.stem)+'.csv',index=False)
 
 if __name__ == "__main__":
-    maketimestamp(sys.argv[1])
+    if len(sys.argv==2):
+        maketimestamp(sys.argv[1])
+    else:
+        maketimestamp(sys.argv[1],sys.argv[2])

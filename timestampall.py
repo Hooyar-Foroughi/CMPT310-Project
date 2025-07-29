@@ -6,7 +6,8 @@ import gettimestamp
 
 # --- Configuration ---
 AUDIO_DIRECTORY = "audio"
-TIMESTAMP_DIRECTORY = "timestamp"
+AGTIMESTAMP_DIRECTORY = "agtimestamp"
+SPTIMESTAMP_DIRECTORY = "sptimestamp"
 AUDIO_FILE_EXTENSION = ".wav"
 TIMESTAMP_FILE_EXTENSION = ".csv"
 # -------------------
@@ -18,18 +19,27 @@ def run_timestamp_check():
     """
     print(f"Starting timestamp check...")
     print(f"Audio directory: {AUDIO_DIRECTORY}")
-    print(f"Timestamp directory: {TIMESTAMP_DIRECTORY}")
+    print(f"agTimestamp directory: {AGTIMESTAMP_DIRECTORY}")
+    print(f"spTimestamp directory: {SPTIMESTAMP_DIRECTORY}")
 
     if not os.path.isdir(AUDIO_DIRECTORY):
         print(f"Error: Audio directory '{AUDIO_DIRECTORY}' not found.")
         print("Please create it and place your audio files inside.")
         return
 
-    if not os.path.exists(TIMESTAMP_DIRECTORY):
-        print(f"Timestamp directory '{TIMESTAMP_DIRECTORY}' not found. Creating it...")
-        os.makedirs(TIMESTAMP_DIRECTORY)
-    elif not os.path.isdir(TIMESTAMP_DIRECTORY):
-        print(f"Error: A file named '{TIMESTAMP_DIRECTORY}' exists, but it's not a directory.")
+    if not os.path.exists(AGTIMESTAMP_DIRECTORY):
+        print(f"Timestamp directory '{AGTIMESTAMP_DIRECTORY}' not found. Creating it...")
+        os.makedirs(AGTIMESTAMP_DIRECTORY)
+    elif not os.path.isdir(AGTIMESTAMP_DIRECTORY):
+        print(f"Error: A file named '{AGTIMESTAMP_DIRECTORY}' exists, but it's not a directory.")
+        print("Please resolve this conflict.")
+        return
+    
+    if not os.path.exists(SPTIMESTAMP_DIRECTORY):
+        print(f"Timestamp directory '{SPTIMESTAMP_DIRECTORY}' not found. Creating it...")
+        os.makedirs(SPTIMESTAMP_DIRECTORY)
+    elif not os.path.isdir(SPTIMESTAMP_DIRECTORY):
+        print(f"Error: A file named '{SPTIMESTAMP_DIRECTORY}' exists, but it's not a directory.")
         print("Please resolve this conflict.")
         return
 
@@ -43,25 +53,25 @@ def run_timestamp_check():
     print(f"Found {len(all_audio_files)} audio files to check.")
 
     for audio_file_name in all_audio_files:
-        # Extract the base name (e.g., "hiyis" from "hiyis.wav")
-        base_name = os.path.splitext(audio_file_name)[0]
+        for dir in [AGTIMESTAMP_DIRECTORY,SPTIMESTAMP_DIRECTORY]:
+            base_name = os.path.splitext(audio_file_name)[0]
+            full_audio_path = os.path.join(AUDIO_DIRECTORY, audio_file_name)
 
-        # Construct the full path to the audio file
-        full_audio_path = os.path.join(AUDIO_DIRECTORY, audio_file_name)
+            expected_csv_file = f"{base_name}{TIMESTAMP_FILE_EXTENSION}"
+            full_csv_path = os.path.join(dir, expected_csv_file)
+            print(f"\nChecking: {audio_file_name}")
+            print(f"  Expected CSV: {full_csv_path}")
 
-        # Construct the expected path for the corresponding CSV file
-        expected_csv_file = f"{base_name}{TIMESTAMP_FILE_EXTENSION}"
-        full_csv_path = os.path.join(TIMESTAMP_DIRECTORY, expected_csv_file)
 
-        print(f"\nChecking: {audio_file_name}")
-        print(f"  Expected CSV: {full_csv_path}")
+            if not os.path.exists(full_csv_path):
+                print(f"  CSV file NOT found for '{audio_file_name}'.")
+                if dir==AGTIMESTAMP_DIRECTORY:
+                    gettimestamp.maketimestamp(full_audio_path)
+                else:
+                    gettimestamp.maketimestamp(full_audio_path,'sp')
+            else:
+                print(f"  CSV file already exists for '{audio_file_name}'. Skipping.")
 
-        # Check if the CSV file exists
-        if not os.path.exists(full_csv_path):
-            print(f"  CSV file NOT found for '{audio_file_name}'.")
-            gettimestamp.maketimestamp(full_audio_path)
-        else:
-            print(f"  CSV file already exists for '{audio_file_name}'. Skipping.")
 
     print("\nTimestamp check complete.")
 

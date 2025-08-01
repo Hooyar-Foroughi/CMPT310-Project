@@ -12,3 +12,4 @@ run ```python timestampall.py``` to create timestamp csv files for all newly add
 run ```python gettimestamp.py {path/to/.wavfile} {"ag","sp"}``` to specifically create a timestamp csv for 1 .wav file with Agglomerative or Spatical model
 
 Then you can run ```python audioplayer.py {path/to/.csv}``` to play the audio and display the speakers
+You can also run ```python playbothtimestamps.py {path/to/.csv}``` to play both audio

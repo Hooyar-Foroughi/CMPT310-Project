@@ -13,7 +13,8 @@ To support analysis, we generate visualizations of the clustering output using s
 - **Supervised classification** using Scikit-learn pipelines
 - **Evaluation** using RTTM ground-truth files
 - **Visualizations** of clustering and performance metrics
-
+- **Timestamping** using Spectural and Agglomerative clustering
+- **Real-time VAD with Playback** using Timestamp labels and Pygame to show speakers with coloured squares
 ---
 
 ## Directory Structure
@@ -36,8 +37,8 @@ To support analysis, we generate visualizations of the clustering output using s
 │   ├── evaluate.py       # Provides utilities to compute and save classification metrics
 │   ├── timestampall.py   # Creates timestamp .csv files for every .wav audio file in wav/
 │   ├── gettimestamp.py   # Manual program to create timestamp .csv files selectively, timestampall.py uses this
-│   ├── audioplayer.py    # Displays one clustering model's timestamp .csv labels with audio that undergone VAD filtering in sync
-│   └── playboth.py       # Displays both clustering model's timestamp .csv labels in their own players at the same time
+│   ├── audioplayer.py    # Displays one clustering model's timestamp .csv labels in real-time with audio that undergone VAD filtering in sync
+│   └── playbothtimestamps.py # Displays both clustering model's timestamp .csv labels in real-time their own players at the same time
 ├── config.yaml           # Main configuration file
 ├── run.py                # CLI runner
 └── requirements.txt      # Python dependencies

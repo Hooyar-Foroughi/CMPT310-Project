@@ -10,5 +10,6 @@ pyyaml
 joblib
 matplotlib
 soundfile
+pygame-ce
 # Optional — only if you train XGBoost models
 xgboost

@@ -49,6 +49,14 @@ def main():
     pr.add_argument("--model", default="models/speaker_count_mlp.pkl")
     pr.add_argument("--rttm_dir", default=None, help="Directory containing RTTM files")
 
+    pr = sub.add_parser("timestamp")
+
+    pr = sub.add_parser("playaudio")
+    pr.add_argument("path", help="csv timestamp file in data/agtimestamp or data/sptimestamp")
+
+    pr = sub.add_parser("playboth")
+    pr.add_argument("path", help="csv timestamp file in data/agtimestamp or data/sptimestamp")
+
     args = parser.parse_args()
     task = args.cmd or cfg.get("task", "cluster")
 
@@ -134,6 +142,24 @@ def main():
         # Hand-off to vis module
         from src import visualization
         visualization.main_cluster_scatter()
+    elif task == "timestamp":
+        print("[RUN] Timestamping …")
+        from src.timestampall import run_timestamp_check
+        run_timestamp_check()
+    elif task == "playaudio":
+        if len(sys.argv)<3:
+            print('Please specify an timestamp CSV file')
+            return
+        print("[RUN] Playing audio …")
+        from src.audioplayer import audioplayer
+        audioplayer(sys.argv[2])
+    elif task == "playboth":
+        if len(sys.argv)<3:
+            print('Please specify an timestamp CSV file')
+            return
+        print("[RUN] Playing both audio …")
+        from src.playbothtimestamps import playboth
+        playboth(sys.argv[2])
     else:
         raise SystemExit(f"Unknown task {task}")
 

@@ -21,7 +21,9 @@ To support analysis, we generate visualizations of the clustering output using s
 ```
 ├── data/
 │   ├── wav/              # Raw .wav audio files
-│   └── rttm/             # Corresponding RTTM label files
+│   ├── rttm/             # Corresponding RTTM label files
+│   ├── agtimestamp/      # Timestamps .csv created by Agglomerative Clustering
+│   └── sptimestamp/      # Timestamp .csv created by Spectural Clustering
 ├── models/               # Saved supervised models
 ├── results/              # CSV results for predictions and clustering
 ├── visualizations/       # Clustering scatter plots
@@ -31,7 +33,11 @@ To support analysis, we generate visualizations of the clustering output using s
 │   ├── visualization.py  # Plotting tools
 │   ├── filter_dataset.py # Filters our /data to keep appropriate samples
 │   ├── clustering.py     # Implements unsupervised speaker count prediction
-│   └── evaluate.py       # Provides utilities to compute and save classification metrics
+│   ├── evaluate.py       # Provides utilities to compute and save classification metrics
+│   ├── timestampall.py   # Creates timestamp .csv files for every .wav audio file in wav/
+│   ├── gettimestamp.py   # Manual program to create timestamp .csv files selectively, timestampall.py uses this
+│   ├── audioplayer.py    # Displays one clustering model's timestamp .csv labels with audio that undergone VAD filtering in sync
+│   └── playboth.py       # Displays both clustering model's timestamp .csv labels in their own players at the same time
 ├── config.yaml           # Main configuration file
 ├── run.py                # CLI runner
 └── requirements.txt      # Python dependencies

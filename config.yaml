@@ -4,8 +4,11 @@
 #  3. Run the script using the command: python3 run.py at the project root.
 
 # ----------------------------------  Task selector  
-# One of: cluster | extract | train | predict | visualize | cluster_scatter
-task: cluster_scatter
+# One of: cluster | extract | train | predict | visualize | cluster_scatter | timestampall
+# playaudio and playboth are also options but they need to be manually inputted as an argument in run.py, along with a csv path
+# task: cluster_scatter
+task: timestamp
+
 
 # ----------------------------------  General settings and paths ----------------------------------
 

@@ -1,4 +1,5 @@
-
+import torch
+import torch.nn as nn
 import numpy as np
 import sys
 import os
@@ -7,102 +8,96 @@ import os
 sys.path.append('src')
 
 from learning_env import SpeakerEnvironment
+from rl_agent import ActorCriticAgent
+from rl_trainer import RLTrainer
 
-def test_environment():
-    """Test the RL environment with a simple example"""
+def main():
+    """Main training script"""
+    print("RL Speaker Diarization Training")
     
-    print(" Testing RL Speaker Diarization Environment")
-
     
-    # Initialize environment
-    audio_file = "audio/jyirt.wav"
+    # Configuration
+    audio_file = "audio/cjfer.wav"
+    segment_duration = 0.5  # Slightly longer for Resemblyzer
+    num_episodes = 15  # Fewer episodes for testing
+    learning_rate = 0.001  # More stable learning rate
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    
+    print(f" Configuration:")
+    print(f"Audio file: {audio_file}")
+    print(f"Segment duration: {segment_duration}s")
+    print(f"Episodes: {num_episodes}")
+    print(f"Learning rate: {learning_rate}")
+    print(f"Device: {device}")
+    
+    # Check if audio file exists
     if not os.path.exists(audio_file):
-        print(" Audio file {audio_file} not found!")
+        print(f"Audio file {audio_file} not found!")
         return
     
-    print(f" Loading audio file: {audio_file}")
-    env = SpeakerEnvironment(audio_file, segment_duration=1.0)
-    
+    # Create environment
+    print(f"\nCreating environment...")
+    env = SpeakerEnvironment(audio_file, segment_duration=segment_duration)
     print(f"Environment created with {env.n_segments} segments")
-    print(f"  Audio duration: {env.duration:.2f} seconds")
     
-    # Test reset
-    print("\n Testing reset...")
-    initial_state = env.reset()
-    print(f" Initial state shape: {initial_state.shape}")
-    print(f" Initial state values: {initial_state[:5]}...")  
-    
-    print("\n Testing environment steps...")
-    for step in range(3):  # Test first 3 steps
-        print(f"\n--- Step {step + 1} ---")
-        
-        # Show current state
-        current_state = env._get_state()
-        print(f" Current state shape: {current_state.shape}")
-        
-        # Take a random action (speaker assignment)
-        action = np.random.randint(0, 5)  # Random speaker 0-4
-        print(f"Agent chooses speaker: {action}")
-        
-        # Take step
-        next_state, reward, done = env.step(action)
-        
-        print(f" Reward: {reward:.3f}")
-        print(f" Done: {done}")
-        print(f"Speaker assignments so far: {env.speaker_assignments}")
-        
-        if done:
-            print("Episode finished!")
-            break
-    
-   
-    print("\n Final Results:")
-    print(f" Total speaker assignments: {len(env.speaker_assignments)}")
-    print(f" Unique speakers used: {len(set(env.speaker_assignments))}")
-    print(f" Speaker distribution: {dict(zip(*np.unique(env.speaker_assignments, return_counts=True)))}")
-
-def test_feature_extraction():
-    """Test just the feature extraction"""
-    print("\n Testing Feature Extraction")
-    
-    
-    audio_file = "audio/jyirt.wav"
-    if not os.path.exists(audio_file):
-        print(f" Audio file {audio_file} not found!")
+    # Determine state and action sizes
+    test_state = env.reset()
+    if test_state is None:
+        print("Failed to get initial state!")
         return
     
-    env = SpeakerEnvironment(audio_file, segment_duration=1.0)
+    state_size = test_state.shape[0]
+    action_size = 5  # 5 possible speakers (0-4)
     
-    # Test feature extraction on first segment
-    if len(env.segments) > 0:
-        first_segment = env.segments[0]
-        features = first_segment['features']
-        
-        print(f" Feature vector shape: {features.shape}")
-        print(f"Feature values: {features}")
-        
-        # Show what each feature represents
-        feature_names = [
-            "MFCC Mean (13 values)",
-            "MFCC Std (13 values)", 
-            "Spectral Centroid",
-            "Spectral Rolloff",
-            "Spectral Bandwidth",
-            "Pitch Mean",
-            "Pitch Std"
-        ]
-        
-        print("\n Feature breakdown:")
-        start_idx = 0
-        for i, name in enumerate(feature_names):
-            if i < 2:  # MFCC features have 13 values each
-                end_idx = start_idx + 13
-                print(f"  {name}: {features[start_idx:end_idx][:3]}...")  # Show first 3
-                start_idx = end_idx
-            else:  # Single values
-                print(f"  {name}: {features[start_idx]:.3f}")
-                start_idx += 1
+    print(f"State size: {state_size}, Action size: {action_size}")
+    
+    # Create agent
+    print(f"\nCreating RL agent...")
+    agent = ActorCriticAgent(
+        state_size=state_size,
+        action_size=action_size,
+        learning_rate=learning_rate,
+        device=device
+    )
+    print(f"Agent created successfully")
+    
+    # Create trainer
+    print(f"\n Creating trainer...")
+    trainer = RLTrainer(agent, env, device=device)
+    print(f"Trainer created successfully")
+    
+    # Create directories
+    os.makedirs('models', exist_ok=True)
+    os.makedirs('visualizations', exist_ok=True)
+    
+    # Train the agent
+    print(f"\nStarting training...")
+    episode_rewards, actor_losses, critic_losses = trainer.train(
+        num_episodes=num_episodes,
+        save_interval=5,  # Save more frequently
+        plot_interval=5    # Plot more frequently
+    )
+    
+    # Evaluate the trained agent
+    print(f"\nEvaluating trained agent...")
+    avg_reward, results = trainer.evaluate(num_episodes=5)
+    
+    # Save final model
+    agent.save('models/final_rl_agent.pth')
+    print(f"Final model saved!")
+    
+    # Print some results
+    print(f"\nSample Results:")
+    for i, result in enumerate(results[:3]):  # Show first 3 episodes
+        print(f"   Episode {i+1}: {len(result)} segments, {len(set(result))} unique speakers")
+        print(f"   Speaker distribution: {dict(zip(*np.unique(result, return_counts=True)))}")
+    
+    print(f"\nTraining complete! Check models/ and visualizations/ folders for results.")
 
 if __name__ == "__main__":
-    test_environment()
-    test_feature_extraction() 
+    main()
+
+
+
+
+

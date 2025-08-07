@@ -5,3 +5,13 @@
 # Ignore Python bytecode cache directories
 __pycache__/
 **/__pycache__/
+
+
+# Ignore audio files
+audio/
+
+# Ignore model files
+models/
+
+# Ignore visualizations
+visualizations/

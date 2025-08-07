@@ -72,11 +72,78 @@ The task is configured through `config.yaml`.
 
 ---
 
-## Config (`config.yaml`) 
+## Config
 
+All experiment settings are defined in [`config.yaml`](config.yaml). To run any task, edit the file to specify the `task:` name and adjust related settings as needed. Below is an overview of the available tasks and how to configure each section:
+
+#### Task Selector
+Set the main task to run:
 ```yaml
-...
+task: cluster  # Options: cluster | extract | train | predict | visualize | cluster_scatter | timestampall
 ```
+
+#### General Settings
+These settings apply across most tasks:
+```yaml
+rate: 4             # Frame rate for embedding extraction (higher = more granularity, slower)
+workers: 1          # Number of parallel threads to use
+wav_dir: data/wav   # Folder containing input WAV files
+rttm_dir: data/rttm # Folder of ground-truth RTTM files (used for evaluation)
+out_dir: results    # Folder to save all .txt and .csv output
+```
+
+#### Unsupervised Clustering (`task: cluster`)
+```yaml
+cluster_target: data/wav/leneg.wav  # Set a single .wav file for prediction, or use 'data/wav/' to evaluate over all files
+method: spectral                    # Clustering method: spectral | agglomerative | hdbscan
+kmin: 2                             # Minimum number of clusters (used for evaluation loop)
+kmax: 5                             # Maximum number of clusters
+```
+- If running on a **single file**, the script will output the predicted number of speakers.
+- If running on a **folder of .wav files**, and RTTM files are present in `rttm_dir`, it will evaluate results and generate `.csv`/`.txt` output in `out_dir`.
+
+#### Feature Extraction (`task: extract`)
+```yaml
+features_csv: features_pooled.csv  # Output path for extracted features
+```
+This extracts pooled features (e.g., MFCCs, RMS, pitch, etc.) from each file and stores them in a single `.csv`.
+
+#### Supervised Training (`task: train`)
+```yaml
+algo: xgb  # Options: xgb | hgb | mlp
+```
+- Trains a model to predict number of speakers based on features.
+- Uses `features_csv` from the `extract` task.
+
+#### Supervised Prediction (`task: predict`)
+```yaml
+model_path: models/speaker_count_mlp.pkl  # Path to trained model
+predict_target: data/wav/gylzn.wav        # File or folder to predict
+```
+- Predicts speaker count for each `.wav` file using the selected model.
+
+#### Visualizing Results (`task: visualize`)
+```yaml
+viz_csv: results/sup_xgb.csv  # CSV file containing prediction and label results
+```
+- Produces confusion matrices and per-class precision/recall/F1 charts.
+
+#### Scatter Plot Visualization (`task: cluster_scatter`)
+```yaml
+scatter_wav: data/wav/gylzn.wav     # Target .wav file to visualize
+scatter_method: spectral            # Clustering method: spectral | agglomerative | hdbscan
+scatter_rate: 16                    # Embedding frame rate (same meaning as general rate)
+```
+- Produces scatter plots for each `k` between `kmin` and `kmax` using clustering outputs.
+- Displays how embeddings were grouped and whether the prediction matches the true number of speakers (if available).
+
+#### Audio Playback (manual)
+The `playaudio` and `playboth` tasks must be set directly via command-line and require a path to a `.csv` file:
+```bash
+python3 run.py playaudio results/my_results.csv
+```
+These are useful for listening to segments to validate clusters.
+
 ---
 
 ## Requirements

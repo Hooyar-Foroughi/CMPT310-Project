@@ -6,8 +6,7 @@
 # ----------------------------------  Task selector  
 # One of: cluster | extract | train | predict | visualize | cluster_scatter | timestampall
 # playaudio and playboth are also options but they need to be manually inputted as an argument in run.py, along with a csv path
-# task: cluster_scatter
-task: timestamp
+task: cluster_scatter
 
 
 # ----------------------------------  General settings and paths ----------------------------------
@@ -20,7 +19,7 @@ workers: 1
 wav_dir: data/wav  
 # ground-truth RTTM (cluster eval only)        
 rttm_dir: data/rttm 
- # where CSV / TXT metrics are saved        
+# where CSV / TXT metrics are saved        
 out_dir: results   
 
 # ----------------------------------  Per task settings below ----------------------------------
@@ -30,9 +29,9 @@ out_dir: results
 viz_csv: results/sup_xgb.csv
 
 # ----------------------------------  Clustering visualisation (cluster_scatter task) 
-scatter_wav: data/wav/gylzn.wav
+scatter_wav: data/wav/leneg.wav
 scatter_method: spectral    # or agglomerative / hdbscan
-scatter_rate: 16
+scatter_rate: 4
 
 # ----------------------------------  Unsupervised (cluster task) 
 # Set to 'data/wav' to cluster all WAV files and save results in 'results' folder

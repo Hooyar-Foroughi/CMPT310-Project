@@ -2,14 +2,15 @@ resemblyzer==0.1.4
 numpy
 scipy
 pandas
+matplotlib
+seaborn
 scikit-learn
+xgboost
 hdbscan
 librosa
-tqdm
-pyyaml
-joblib
-matplotlib
 soundfile
+joblib
+pyyaml
+tqdm
 pygame-ce
-# Optional — only if you train XGBoost models
-xgboost
+pydub

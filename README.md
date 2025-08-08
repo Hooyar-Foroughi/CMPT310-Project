@@ -148,7 +148,7 @@ These are useful for listening to segments to validate clusters.
 
 ## Requirements
 
-- Python 3.10+
+- Python 3.11
 - See `requirements.txt` for dependencies
 
 ---

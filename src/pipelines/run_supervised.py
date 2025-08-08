@@ -70,7 +70,7 @@ def train_model(csv_path, algo="mlp"):
     int2label = {v: k for k, v in label2int.items()}
     df["label_idx"] = df["label"].map(label2int)
 
-    # ==== prepare features ====================================================
+    # ---- prepare features ----------------------------------------------
     feature_cols = [
         c for c in df.columns if c not in ("filename", "label", "label_idx")
     ]  # numeric feature names (= original indices as strings)

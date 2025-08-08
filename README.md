@@ -137,12 +137,21 @@ scatter_rate: 16                    # Embedding frame rate (same meaning as gene
 - Produces scatter plots for each `k` between `kmin` and `kmax` using clustering outputs.
 - Displays how embeddings were grouped and whether the prediction matches the true number of speakers (if available).
 
-#### Audio Playback (manual)
-The `playaudio` and `playboth` tasks must be set directly via command-line and require a path to a `.csv` file:
+#### Unsupervised Timestamps (`task: timestamp`)
 ```bash
-python3 run.py playaudio results/my_results.csv
+python3 run.py timestamp
 ```
-These are useful for listening to segments to validate clusters.
+Generates clustered labels timestamps for every .wav file that can be used for audio playback
+
+#### Audio Playback (manual)
+The `playaudio` and `playboth` tasks must be set directly via command-line and require a path to a `.csv` timestamp file:
+```bash
+python3 run.py playaudio agtimestamp/my_results.csv
+python3 run.py playaudio sptimestamp/my_results.csv
+or
+python3 run.py playboth sptimestamp/my_results.csv (or csv in agtimestamp folder)
+```
+These are useful for listening to segments to validate speaker clusters with their respective models.
 
 ---
 

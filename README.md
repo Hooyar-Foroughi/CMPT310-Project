@@ -6,6 +6,14 @@ A particularly promising approach comes from our unsupervised spectral clusterin
 
 To support analysis, we generate visualizations of the clustering output using scatter plots and histograms. These help us interpret how well the embeddings and clustering methods isolate speakers. Visual outputs include per-audio scatter plots of clustered embeddings and bar charts comparing true vs predicted number of speakers, allowing us to evaluate not just accuracy but clustering behavior.
 
+---
+
+**Get Started:** For a quick walkthrough on using the spectral clustering pipeline, check out the [Clustering Pipeline Guide](https://github.com/Hooyar-Foroughi/CMPT310-Project/blob/main/clustering_pipeline_guide.md).
+
+For configuration, installation, and setup details, see the sections below.
+
+---
+
 ## Features
 
 - **Voice encoder-based feature extraction** from audio

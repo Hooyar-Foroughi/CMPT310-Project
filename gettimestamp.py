@@ -102,7 +102,7 @@ def maketimestamp(path,model="ag"):
     timestamp.to_csv(str(Path(outputdirectory)/wav_fpath.stem)+'.csv',index=False)
 
 if __name__ == "__main__":
-    if len(sys.argv==2):
+    if len(sys.argv)==2:
         maketimestamp(sys.argv[1])
     else:
         maketimestamp(sys.argv[1],sys.argv[2])
